@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function HeroCTA() {
     return (
@@ -50,7 +51,12 @@ export default function HeroCTA() {
 
                 {/* Centered Text */}
                 <span className="relative z-10 whitespace-nowrap transition-transform duration-300 group-hover:-translate-x-1.5">
-                    Join Now
+                    <Link
+                        to="/login"
+                    >
+                        Join Now
+                    </Link>
+                    
                 </span>
 
                 {/* Sleek Expanding Arrow Container (Positioned on the Right Side) */}

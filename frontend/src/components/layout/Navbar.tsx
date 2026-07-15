@@ -1,4 +1,5 @@
 import "./Navbar.css";
+import { Link } from "react-router-dom";
 
 import prism from "../../assets/prism.png";
 
@@ -43,17 +44,19 @@ export default function Navbar() {
 
                 <div className="actions">
 
-                    <button className="login">
-
+                    <Link
+                        to="/login"
+                        className="login"
+                    >
                         Login
+                    </Link>
 
-                    </button>
-
-                    <button className="cta">
-
+                    <Link
+                        to="/login"
+                        className="cta"
+                    >
                         Get Started
-
-                    </button>
+                    </Link>
 
                 </div>
 
