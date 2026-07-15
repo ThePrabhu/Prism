@@ -9,7 +9,7 @@ export default function Login() {
     return (
         <AuthLayout>
             <div className="w-full max-w-[560px]">
-                <div className="mb-16">
+                <div className="mb-10">
                     <span
                         className="
                             text-sm
@@ -24,11 +24,12 @@ export default function Login() {
 
                     <h1
                         className="
-                            mt-5
-                            text-6xl
+                            mt-4
+                            text-4xl
+                            lg:text-5xl
                             font-bold
-                            leading-[0.95]
-                            tracking-[-0.06em]
+                            leading-tight
+                            tracking-tight
                             text-zinc-950
                         "
                     >
@@ -37,11 +38,11 @@ export default function Login() {
 
                     <p
                         className="
-                            mt-6
+                            mt-4
                             max-w-xl
-                            text-xl
-                            leading-9
-                            text-zinc-600
+                            text-[1.05rem]
+                            leading-relaxed
+                            text-zinc-500
                         "
                     >
                         Sign in to continue to your Prism workspace.
@@ -49,7 +50,7 @@ export default function Login() {
                 </div>
 
                 <form
-                    className="space-y-10"
+                    className="space-y-6"
                     autoComplete="off"
                 >
                     <AuthInput
@@ -99,13 +100,13 @@ export default function Login() {
                     <button
                         type="submit"
                         className="
-                            mt-5
+                            mt-6
                             flex
-                            h-16
+                            h-12
                             w-full
                             items-center
                             justify-center
-                            rounded-full
+                            rounded-lg
                             bg-zinc-950
                             px-5
                             text-[15px]

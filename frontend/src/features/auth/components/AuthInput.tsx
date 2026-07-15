@@ -30,9 +30,9 @@ const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
                     ref={ref}
                     {...props}
                     className={`
-                        h-14
+                        h-12
                         w-full
-                        rounded-2xl
+                        rounded-xl
                         border
                         border-zinc-200
                         bg-white

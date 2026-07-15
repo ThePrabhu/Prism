@@ -29,21 +29,20 @@ export default function ProblemCard({
                 flex-col
                 items-center
                 justify-center
-                bg-white/86
+                bg-white
+                border
+                border-[#DFE4DD]
+                rounded-none
                 px-8
                 py-12
                 text-center
-                shadow-[0_24px_70px_rgba(15,23,42,0.06)]
+                shadow-sm
+                transition-shadow
+                hover:shadow-md
                 lg:px-10
                 lg:py-14
             "
-            style={{
-                clipPath:
-                    "polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%)",
-            }}
         >
-            <span className="absolute right-0 top-0 h-[22px] w-[22px] bg-emerald-50 shadow-[-1px_1px_0_rgba(16,185,129,0.14)]" />
-
             {/* signature accent — draws in on hover */}
             <span
                 className="

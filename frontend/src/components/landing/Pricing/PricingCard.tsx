@@ -29,7 +29,7 @@ export default function PricingCard({
                 flex
                 min-h-[700px]
                 flex-col
-                rounded-[28px]
+                rounded-none
                 border
                 bg-white
                 p-10
@@ -49,7 +49,7 @@ export default function PricingCard({
                         absolute
                         right-8
                         top-8
-                        rounded-full
+                        rounded-none
                         bg-emerald-500
                         px-3
                         py-1
@@ -165,7 +165,7 @@ export default function PricingCard({
                 className={`
                     mt-12
                     w-full
-                    rounded-xl
+                    rounded-none
                     py-4
                     text-sm
                     font-semibold

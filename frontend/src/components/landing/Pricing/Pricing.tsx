@@ -27,7 +27,7 @@ export default function Pricing() {
 
                 <div className="mt-12 grid gap-6 lg:grid-cols-3">
                     {pricingData.map((item) => (
-                        <PricingCard key={item.name} {...item} />
+                        <PricingCard key={item.title} {...item} />
                     ))}
                 </div>
             </div>

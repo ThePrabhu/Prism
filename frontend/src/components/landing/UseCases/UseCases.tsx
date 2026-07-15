@@ -92,7 +92,7 @@ export default function UseCases() {
                             text-emerald-600
                         "
                     >
-                        USE CASES
+                        CUSTOMERS
                     </span>
 
                     <h2

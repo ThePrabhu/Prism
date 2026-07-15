@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 import FAQItem from "./FAQItem";
 import { faqData } from "./faqData";
 
@@ -19,20 +17,7 @@ export default function FAQ() {
                     px-6
                 "
             >
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                        y: 20,
-                    }}
-                    whileInView={{
-                        opacity: 1,
-                        y: 0,
-                    }}
-                    viewport={{
-                        once: true,
-                    }}
-                    className="text-center"
-                >
+                <div className="text-center">
                     <span
                         className="
                             text-sm
@@ -68,10 +53,10 @@ export default function FAQ() {
                             text-lg
                             leading-8
                             text-zinc-600"
-                        >
+                    >
                         Everything you need to know before using Prism.
                     </p>
-                </motion.div>
+                </div>
 
                 <div className="mt-20">
                     {faqData.map((item) => (

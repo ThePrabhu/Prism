@@ -36,9 +36,9 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                         type={showPassword ? "text" : "password"}
                         {...props}
                         className={`
-                            h-16
+                            h-12
                             w-full
-                            rounded-2xl
+                            rounded-xl
                             border
                             border-zinc-200
                             bg-white
