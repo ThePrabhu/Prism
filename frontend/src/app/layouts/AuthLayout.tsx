@@ -44,8 +44,8 @@ export default function AuthLayout({
                         flex
                         items-center
                         justify-center
-                        px-10
-
+                        px-8
+                        py-20
                         lg:px-24
                     "
                 >

@@ -13,7 +13,7 @@ export default function Register() {
 
                 {/* Header */}
 
-                <div className="mb-16">
+                <div className="mb-10">
 
                     <span
                         className="
@@ -29,11 +29,12 @@ export default function Register() {
 
                     <h1
                         className="
-                            mt-5
-                            text-6xl
+                            mt-4
+                            text-4xl
+                            lg:text-5xl
                             font-bold
-                            leading-[0.95]
-                            tracking-[-0.06em]
+                            leading-tight
+                            tracking-tight
                             text-zinc-950
                         "
                     >
@@ -42,11 +43,11 @@ export default function Register() {
 
                     <p
                         className="
-                            mt-6
+                            mt-4
                             max-w-xl
-                            text-xl
-                            leading-9
-                            text-zinc-600
+                            text-[1.05rem]
+                            leading-relaxed
+                            text-zinc-500
                         "
                     >
                         Create your Prism workspace and start
@@ -59,7 +60,7 @@ export default function Register() {
 
                 <form
                     autoComplete="off"
-                    className="space-y-10"
+                    className="space-y-5"
                 >
 
                     <AuthInput
@@ -133,14 +134,15 @@ export default function Register() {
                     <button
                         type="submit"
                         className="
+                            mt-2
                             flex
-                            h-16
+                            h-12
                             w-full
                             items-center
                             justify-center
-                            rounded-full
+                            rounded-lg
                             bg-zinc-950
-                            text-lg
+                            text-[15px]
                             font-semibold
                             text-white
                             transition

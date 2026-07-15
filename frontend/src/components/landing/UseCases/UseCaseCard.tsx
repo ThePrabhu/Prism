@@ -14,8 +14,8 @@ export default function UseCaseCard({
     icon: Icon,
 }: UseCaseCardProps) {
     return (
-        <article className="rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(240,248,243,0.92))] p-7 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-900 text-white">
+        <article className="rounded-none border border-[#DFE4DD] bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
+            <div className="flex h-12 w-12 items-center justify-center rounded-none bg-emerald-900 text-white">
                 <Icon className="h-6 w-6" />
             </div>
 
