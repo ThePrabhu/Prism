@@ -1,5 +1,9 @@
-import { forwardRef, useState } from "react";
-import type { InputHTMLAttributes } from "react";
+import {
+    forwardRef,
+    useState,
+    type InputHTMLAttributes,
+} from "react";
+
 import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps
@@ -8,14 +12,15 @@ interface PasswordInputProps
     error?: string;
 }
 
-const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+const PasswordInput = forwardRef<
+    HTMLInputElement,
+    PasswordInputProps
+>(
     ({ label, error, className = "", ...props }, ref) => {
         const [showPassword, setShowPassword] = useState(false);
 
         return (
             <div className="space-y-2">
-                {/* Label */}
-
                 <label
                     className="
                         block
@@ -27,55 +32,46 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                     {label}
                 </label>
 
-                {/* Input */}
-
                 <div className="relative">
 
                     <input
                         ref={ref}
                         type={showPassword ? "text" : "password"}
-                        {...props}
                         className={`
-                            h-16
+                            h-12
                             w-full
-                            rounded-2xl
+                            rounded-xl
                             border
-                            border-zinc-200
+                            border-zinc-300
                             bg-white
-                            px-6
+                            px-5
                             pr-14
-                            text-[15px]
-                            text-zinc-900
+                            text-base
                             outline-none
                             transition-all
-                            duration-300
+                            duration-200
                             placeholder:text-zinc-400
-                            hover:border-zinc-300
                             focus:border-emerald-500
                             focus:ring-4
                             focus:ring-emerald-100
-                            disabled:cursor-not-allowed
-                            disabled:bg-zinc-100
                             ${className}
                         `}
+                        {...props}
                     />
-
-                    {/* Toggle */}
 
                     <button
                         type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
+                        onClick={() =>
+                            setShowPassword(!showPassword)
+                        }
                         className="
                             absolute
-                            right-4
+                            right-5
                             top-1/2
                             -translate-y-1/2
-                            rounded-lg
-                            p-1.5
                             text-zinc-500
-                            transition
-                            hover:bg-zinc-100
-                            hover:text-zinc-800
+                            transition-colors
+                            hover:text-zinc-900
                         "
                     >
                         {showPassword ? (
@@ -87,16 +83,8 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 
                 </div>
 
-                {/* Error */}
-
                 {error && (
-                    <p
-                        className="
-                            text-sm
-                            font-medium
-                            text-red-500
-                        "
-                    >
+                    <p className="text-sm text-red-500">
                         {error}
                     </p>
                 )}

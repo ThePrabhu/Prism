@@ -53,7 +53,7 @@ export default function Navbar() {
 
                     <Link
                         to="/login"
-                        className="cta"
+                        className="cta border"
                     >
                         Get Started
                     </Link>

@@ -1,4 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import AuthLayout from "../../../app/layouts/AuthLayout";
 
@@ -6,14 +10,74 @@ import AuthInput from "../components/AuthInput";
 import PasswordInput from "../components/PasswordInput";
 import AuthFooter from "../components/AuthFooter";
 
+import { useAuth } from "../hooks/useAuth";
+
+import {
+    registerSchema,
+    type RegisterForm,
+} from "../validation/auth.schema";
+
 export default function Register() {
+
+    const navigate = useNavigate();
+
+    const {
+        register: registerUser,
+    } = useAuth();
+
+    const [serverError, setServerError] = useState("");
+
+    const {
+        register,
+        handleSubmit,
+        formState: {
+            errors,
+            isSubmitting,
+        },
+    } = useForm<RegisterForm>({
+        resolver: zodResolver(registerSchema),
+    });
+
+    async function onSubmit(data: RegisterForm) {
+
+        try {
+
+            setServerError("");
+
+            await registerUser({
+                fullName: data.fullName,
+                email: data.email,
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            });
+
+            navigate("/login", {
+                replace: true,
+            });
+
+        } catch (error) {
+
+            if (error instanceof Error) {
+                setServerError(error.message);
+            } else {
+
+                setServerError(
+                    "Unable to create your account."
+                );
+
+            }
+
+        }
+
+    }
+
     return (
+
         <AuthLayout>
+
             <div className="w-full max-w-[560px]">
 
-                {/* Header */}
-
-                <div className="mb-16">
+                <div className="mb-10">
 
                     <span
                         className="
@@ -29,11 +93,12 @@ export default function Register() {
 
                     <h1
                         className="
-                            mt-5
-                            text-6xl
+                            mt-4
+                            text-4xl
+                            lg:text-5xl
                             font-bold
-                            leading-[0.95]
-                            tracking-[-0.06em]
+                            leading-tight
+                            tracking-tight
                             text-zinc-950
                         "
                     >
@@ -42,48 +107,83 @@ export default function Register() {
 
                     <p
                         className="
-                            mt-6
+                            mt-4
                             max-w-xl
-                            text-xl
-                            leading-9
-                            text-zinc-600
+                            text-[1.05rem]
+                            leading-relaxed
+                            text-zinc-500
                         "
                     >
-                        Create your Prism workspace and start
-                        managing GST reconciliation with AI.
+                        Create your Prism workspace
+                        and start managing GST
+                        reconciliation with AI.
                     </p>
 
                 </div>
 
-                {/* Form */}
-
                 <form
+
+                    onSubmit={handleSubmit(onSubmit)}
+
+                    className="space-y-5"
+
                     autoComplete="off"
-                    className="space-y-10"
+
                 >
 
                     <AuthInput
                         label="Full Name"
                         placeholder="John Doe"
+                        autoComplete="name"
+                        error={errors.fullName?.message}
+                        {...register("fullName")}
                     />
 
                     <AuthInput
-                        type="email"
                         label="Email Address"
+                        type="email"
+                        autoComplete="email"
                         placeholder="you@company.com"
+                        error={errors.email?.message}
+                        {...register("email")}
                     />
 
                     <PasswordInput
                         label="Password"
-                        placeholder="Create a strong password"
+                        autoComplete="new-password"
+                        placeholder="Create a password"
+                        error={errors.password?.message}
+                        {...register("password")}
                     />
 
                     <PasswordInput
                         label="Confirm Password"
+                        autoComplete="new-password"
                         placeholder="Confirm your password"
+                        error={errors.confirmPassword?.message}
+                        {...register("confirmPassword")}
                     />
 
-                    <label
+                    {serverError && (
+
+                        <div
+                            className="
+                                rounded-2xl
+                                border
+                                border-red-200
+                                bg-red-50
+                                px-5
+                                py-4
+                                text-sm
+                                text-red-600
+                            "
+                        >
+                            {serverError}
+                        </div>
+
+                    )}
+
+                                        <label
                         className="
                             flex
                             items-start
@@ -102,53 +202,70 @@ export default function Register() {
                                 rounded
                                 border-zinc-300
                                 text-emerald-600
+                                focus:ring-emerald-500
                             "
                         />
 
                         <span>
                             I agree to the{" "}
+
                             <Link
                                 to="/terms"
                                 className="
                                     font-medium
                                     text-emerald-600
+                                    hover:text-emerald-700
                                 "
                             >
                                 Terms of Service
                             </Link>
+
                             {" "}and{" "}
+
                             <Link
                                 to="/privacy"
                                 className="
                                     font-medium
                                     text-emerald-600
+                                    hover:text-emerald-700
                                 "
                             >
                                 Privacy Policy
-                            </Link>.
+                            </Link>
+
                         </span>
 
                     </label>
 
                     <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="
+                            mt-2
                             flex
-                            h-16
+                            h-12
                             w-full
                             items-center
                             justify-center
-                            rounded-full
+                            rounded-lg
                             bg-zinc-950
-                            text-lg
+                            px-6
+                            text-[15px]
                             font-semibold
                             text-white
-                            transition
+                            transition-all
                             duration-300
                             hover:bg-zinc-800
+                            hover:shadow-[0_18px_40px_rgba(0,0,0,.18)]
+                            disabled:cursor-not-allowed
+                            disabled:opacity-60
+                            disabled:hover:bg-zinc-950
+                            disabled:hover:shadow-none
                         "
                     >
-                        Create Account
+                        {isSubmitting
+                            ? "Creating Account..."
+                            : "Create Account"}
                     </button>
 
                 </form>
@@ -164,6 +281,7 @@ export default function Register() {
                 </div>
 
             </div>
+
         </AuthLayout>
     );
 }

@@ -1,13 +1,78 @@
 // import { Link } from "react-router-dom";
+import { useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import AuthLayout from "../../../app/layouts/AuthLayout";
 
 import AuthInput from "../components/AuthInput";
 import AuthFooter from "../components/AuthFooter";
 
+import { useAuth } from "../hooks/useAuth";
+
+import {
+    forgotPasswordSchema,
+    type ForgotPasswordForm,
+} from "../validation/auth.schema";
+
 export default function ForgotPassword() {
+
+    const { forgotPassword } = useAuth();
+
+    const [serverError, setServerError] = useState("");
+
+    const [emailSent, setEmailSent] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        formState: {
+            errors,
+            isSubmitting,
+        },
+    } = useForm<ForgotPasswordForm>({
+        resolver: zodResolver(
+            forgotPasswordSchema
+        ),
+    });
+
+    async function onSubmit(
+        data: ForgotPasswordForm
+    ) {
+
+        try {
+
+            setServerError("");
+
+            await forgotPassword({
+                email: data.email,
+            });
+
+            setEmailSent(true);
+
+        } catch (error) {
+
+            if (error instanceof Error) {
+
+                setServerError(error.message);
+
+            } else {
+
+                setServerError(
+                    "Unable to send reset email."
+                );
+
+            }
+
+        }
+
+    }
+
     return (
+
         <AuthLayout>
+
             <div className="w-full max-w-[560px]">
 
                 <div className="mb-16">
@@ -31,8 +96,9 @@ export default function ForgotPassword() {
                             font-bold
                             leading-[0.95]
                             tracking-[-0.06em]
-                            text-zinc-950"
-                        >
+                            text-zinc-950
+                        "
+                    >
                         Forgot Password
                     </h1>
 
@@ -44,22 +110,68 @@ export default function ForgotPassword() {
                             text-zinc-600
                         "
                     >
-                        Enter your email address and we'll send you a secure
-                        password reset link.
+                        Enter your registered email
+                        address and we'll send you
+                        a password reset link.
                     </p>
 
                 </div>
 
-                <form className="space-y-10">
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="space-y-10"
+                >
 
                     <AuthInput
                         label="Email Address"
                         type="email"
+                        autoComplete="email"
                         placeholder="you@company.com"
+                        error={errors.email?.message}
+                        {...register("email")}
                     />
 
-                    <button
+                    {serverError && (
+
+                        <div
+                            className="
+                                rounded-2xl
+                                border
+                                border-red-200
+                                bg-red-50
+                                px-5
+                                py-4
+                                text-sm
+                                text-red-600
+                            "
+                        >
+                            {serverError}
+                        </div>
+
+                    )}
+
+                    {emailSent && (
+
+                        <div
+                            className="
+                                rounded-2xl
+                                border
+                                border-emerald-200
+                                bg-emerald-50
+                                px-5
+                                py-4
+                                text-sm
+                                text-emerald-700
+                            "
+                        >
+                            Password reset email sent.
+                            Please check your inbox.
+                        </div>
+
+                    )}
+                                        <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="
                             flex
                             h-16
@@ -68,14 +180,23 @@ export default function ForgotPassword() {
                             justify-center
                             rounded-full
                             bg-zinc-950
-                            text-lg
+                            px-6
+                            text-base
                             font-semibold
                             text-white
-                            transition
+                            transition-all
+                            duration-300
                             hover:bg-zinc-800
+                            hover:shadow-[0_18px_40px_rgba(0,0,0,.18)]
+                            disabled:cursor-not-allowed
+                            disabled:opacity-60
+                            disabled:hover:bg-zinc-950
+                            disabled:hover:shadow-none
                         "
                     >
-                        Send Reset Link
+                        {isSubmitting
+                            ? "Sending..."
+                            : "Send Reset Link"}
                     </button>
 
                 </form>
@@ -91,6 +212,7 @@ export default function ForgotPassword() {
                 </div>
 
             </div>
+
         </AuthLayout>
     );
 }

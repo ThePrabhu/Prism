@@ -1,5 +1,7 @@
-import { forwardRef } from "react";
-import type { InputHTMLAttributes } from "react";
+import {
+    forwardRef,
+    type InputHTMLAttributes,
+} from "react";
 
 interface AuthInputProps
     extends InputHTMLAttributes<HTMLInputElement> {
@@ -11,8 +13,6 @@ const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
     ({ label, error, className = "", ...props }, ref) => {
         return (
             <div className="space-y-2">
-                {/* Label */}
-
                 <label
                     className="
                         block
@@ -24,45 +24,31 @@ const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
                     {label}
                 </label>
 
-                {/* Input */}
-
                 <input
                     ref={ref}
-                    {...props}
                     className={`
-                        h-14
+                        h-12
                         w-full
-                        rounded-2xl
+                        rounded-xl
                         border
-                        border-zinc-200
-                        bg-white
                         px-5
-                        text-[15px]
-                        text-zinc-900
+                        text-base
                         outline-none
                         transition-all
-                        duration-300
-                        placeholder:text-zinc-400
-                        hover:border-zinc-300
+                        duration-200
+                        bg-white
+                        border-zinc-300
                         focus:border-emerald-500
                         focus:ring-4
                         focus:ring-emerald-100
-                        disabled:cursor-not-allowed
-                        disabled:bg-zinc-100
+                        placeholder:text-zinc-400
                         ${className}
                     `}
+                    {...props}
                 />
 
-                {/* Error */}
-
                 {error && (
-                    <p
-                        className="
-                            text-sm
-                            font-medium
-                            text-red-500
-                        "
-                    >
+                    <p className="text-sm text-red-500">
                         {error}
                     </p>
                 )}

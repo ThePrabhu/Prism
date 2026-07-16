@@ -1,91 +1,71 @@
 .navbar{
 
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-z-index:1000;
-
-backdrop-filter:blur(18px);
-
-background:rgba(248,248,245,.72);
-
-border-bottom:1px solid rgba(0,0,0,.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(18px);
+    background: rgba(248, 248, 245, .72);
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
 
 }
 
 .navbar-container{
 
-max-width:1320px;
-
-margin:auto;
-
-height:82px;
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-between;
-
-padding:0 28px;
-
+    max-width: 1320px;
+    margin: auto;
+    height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    position: relative;
+    background: inherit;
+    z-index: 10;
 }
 
 .logo{
 
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-font-family:Sora,sans-serif;
-
-font-size:1.45rem;
-
-font-weight:700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: Sora, sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
 
 }
 
 .logo img{
 
-height:42px;
-
+ height: 42px;
 }
 
 nav{
 
-display:flex;
-
-gap:42px;
-
+    display: flex;
+    gap: 42px;
 }
 
 nav a{
 
-font-weight:500;
-
-transition:.25s;
+  font-weight: 500;
+    transition: .25s;
 
 }
 
 nav a:hover{
 
-color:#507C65;
+color: #507C65;
 
 }
 
 .actions{
 
-display:flex;
-
-gap:18px;
-
+   display: flex;
+    gap: 18px;
+    align-items: center;
+    
 }
 
 .login{
@@ -100,28 +80,18 @@ font-weight:600;
 
 }
 
-.cta{
-
-padding:14px 28px;
-
-border:none;
-
-border-radius:999px;
-
-background:#068a48;
-
-color:white;
-
-font-weight:600;
-
-transition:.3s;
-
+.cta {
+  padding: 14px 28px;
+  border: none;
+  /* Change this from 999px to 0 for a sharp box look */
+  border-radius: 5px; 
+  background: #08ba61;
+  color: rgb(8, 2, 2);
+  font-weight: 900;
+  transition: .3s;
 }
 
-.cta:hover{
-
-transform:translateY(-2px);
-
-background:#507C65;
-
+.cta:hover {
+  transform: translateY(-2px);
+  background: #507C65;
 }
