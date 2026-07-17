@@ -71,7 +71,7 @@ export default function Login() {
 
     return (
         <AuthLayout>
-            <div className="w-full max-w-[560px]">
+            <div className="w-full max-w-140">
 
                 <div className="mb-10">
 
