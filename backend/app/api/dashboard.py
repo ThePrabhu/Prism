@@ -1,21 +1,8 @@
-from fastapi import APIRouter
-from fastapi import Depends
-
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-
-from app.dependencies.current_user import (
-    get_current_user,
-)
-
-from app.schemas.dashboard import (
-    DashboardSummary,
-)
-
-from app.services.dashboard_service import (
-    DashboardService,
-)
+from app.services.dashboard_service import DashboardService
 
 router = APIRouter(
     prefix="/dashboard",
@@ -23,21 +10,44 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "/{workspace_id}",
-    response_model=DashboardSummary,
-)
-def get_dashboard(
-
-    workspace_id: str,
-
+@router.get("/summary")
+def summary(
     db: Session = Depends(get_db),
-
-    user=Depends(get_current_user),
-
 ):
+    return DashboardService.get_summary(db)
 
-    return DashboardService.get_summary(
+
+@router.get("/recent-uploads")
+def recent_uploads(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+):
+    return DashboardService.get_recent_uploads(
         db,
-        workspace_id,
+        limit,
     )
+
+
+@router.get("/invoice-stats")
+def invoice_stats(
+    db: Session = Depends(get_db),
+):
+    return DashboardService.get_invoice_stats(db)
+
+
+@router.get("/vendors")
+def vendors(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+):
+    return DashboardService.get_vendor_stats(
+        db,
+        limit,
+    )
+
+
+@router.get("/charts")
+def charts(
+    db: Session = Depends(get_db),
+):
+    return DashboardService.get_monthly_chart(db)

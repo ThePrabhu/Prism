@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy.orm import Session
 
 from app.models.invoice import Invoice
@@ -12,64 +14,156 @@ class InvoiceService:
         rows: list,
     ):
 
-        invoices = []
+        imported = 0
+        duplicates = 0
+        failed = 0
 
         for row in rows:
 
-            invoice = Invoice(
+            try:
 
-                upload_id=upload_id,
+                invoice_number = (
+                    row.get("invoice_number") or ""
+                ).strip()
 
-                invoice_number=row.get(
-                    "invoice_number"
-                ),
+                supplier_gstin = (
+                    row.get("supplier_gstin") or ""
+                ).strip()
 
-                invoice_date=row.get(
-                    "invoice_date"
-                ),
+                invoice_date = (
+                    row.get("invoice_date") or ""
+                ).strip()
 
-                seller_name=row.get(
-                    "seller_name"
-                ),
+                if not invoice_number:
 
-                buyer_name=row.get(
-                    "buyer_name"
-                ),
+                    failed += 1
+                    continue
 
-                gstin=row.get(
-                    "gstin"
-                ),
-
-                taxable_value=float(
-                    row.get(
-                        "taxable_value",
-                        0,
+                existing = (
+                    db.query(Invoice)
+                    .filter(
+                        Invoice.invoice_number == invoice_number,
+                        Invoice.supplier_gstin == supplier_gstin,
+                        Invoice.invoice_date == invoice_date,
                     )
-                    or 0
-                ),
+                    .first()
+                )
 
-                gst_amount=float(
-                    row.get(
-                        "gst_amount",
-                        0,
-                    )
-                    or 0
-                ),
+                if existing:
 
-                total_amount=float(
-                    row.get(
-                        "total_amount",
-                        0,
-                    )
-                    or 0
-                ),
+                    duplicates += 1
+                    continue
 
-            )
+                invoice = Invoice(
 
-            invoices.append(invoice)
+                    id=str(uuid.uuid4()),
 
-        db.add_all(invoices)
+                    upload_id=upload_id,
+
+                    invoice_number=invoice_number,
+
+                    invoice_date=invoice_date,
+
+                    supplier_gstin=supplier_gstin,
+
+                    recipient_gstin=(
+                        row.get("recipient_gstin") or ""
+                    ),
+
+                    taxable_value=float(
+                        row.get("taxable_value") or 0
+                    ),
+
+                    gst_amount=float(
+                        row.get("gst_amount") or 0
+                    ),
+
+                    total_amount=float(
+                        row.get("total_amount") or 0
+                    ),
+
+                    status="IMPORTED",
+
+                )
+
+                db.add(invoice)
+
+                imported += 1
+
+            except Exception:
+
+                failed += 1
 
         db.commit()
 
-        return len(invoices)
+        return {
+
+            "imported": imported,
+
+            "duplicates": duplicates,
+
+            "failed": failed,
+
+        }
+
+    @staticmethod
+    def get_all(
+        db: Session,
+    ):
+
+        return (
+            db.query(Invoice)
+            .all()
+        )
+
+    @staticmethod
+    def get_by_id(
+        db: Session,
+        invoice_id: str,
+    ):
+
+        return (
+            db.query(Invoice)
+            .filter(
+                Invoice.id == invoice_id
+            )
+            .first()
+        )
+
+    @staticmethod
+    def get_by_upload(
+        db: Session,
+        upload_id: str,
+    ):
+
+        return (
+            db.query(Invoice)
+            .filter(
+                Invoice.upload_id == upload_id
+            )
+            .all()
+        )
+
+    @staticmethod
+    def delete(
+        db: Session,
+        invoice_id: str,
+    ):
+
+        invoice = (
+            db.query(Invoice)
+            .filter(
+                Invoice.id == invoice_id
+            )
+            .first()
+        )
+
+        if not invoice:
+
+            return False
+
+        db.delete(invoice)
+
+        db.commit()
+
+        return True

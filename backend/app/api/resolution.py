@@ -1,15 +1,13 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.dependencies.current_user import (
-    get_current_user,
-)
 
 from app.schemas.resolution import (
-    ResolutionResponse,
+    ResolutionCaseResponse,
 )
 
 from app.services.resolution_service import (
@@ -22,36 +20,93 @@ router = APIRouter(
 )
 
 
-@router.post("/{workspace_id}/generate")
-def generate_cases(
-    workspace_id: str,
+@router.post("/run")
+def run_resolution_engine(
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
 ):
 
-    cases = ResolutionService.generate_cases(
-        db,
-        workspace_id,
-    )
-
-    return {
-
-        "generated": len(cases)
-
-    }
+    return ResolutionService.run(db)
 
 
 @router.get(
-    "/{workspace_id}",
-    response_model=list[ResolutionResponse],
+    "/",
+    response_model=list[ResolutionCaseResponse],
 )
-def get_cases(
-    workspace_id: str,
+def get_resolution_cases(
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
 ):
 
-    return ResolutionService.list_cases(
+    return ResolutionService.get_all(db)
+
+
+@router.get(
+    "/{case_id}",
+    response_model=ResolutionCaseResponse,
+)
+def get_resolution_case(
+    case_id: str,
+    db: Session = Depends(get_db),
+):
+
+    case = ResolutionService.get_by_id(
         db,
-        workspace_id,
+        case_id,
     )
+
+    if case is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Resolution case not found.",
+        )
+
+    return case
+
+
+@router.patch(
+    "/{case_id}",
+    response_model=ResolutionCaseResponse,
+)
+def update_resolution_case(
+    case_id: str,
+    status: str,
+    db: Session = Depends(get_db),
+):
+
+    case = ResolutionService.update_status(
+        db,
+        case_id,
+        status,
+    )
+
+    if case is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Resolution case not found.",
+        )
+
+    return case
+
+
+@router.delete("/{case_id}")
+def delete_resolution_case(
+    case_id: str,
+    db: Session = Depends(get_db),
+):
+
+    deleted = ResolutionService.delete(
+        db,
+        case_id,
+    )
+
+    if not deleted:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Resolution case not found.",
+        )
+
+    return {
+        "message": "Resolution case deleted successfully."
+    }

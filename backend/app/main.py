@@ -11,9 +11,6 @@ from app.api.workspaces import (
 from app.api.upload import (
     router as upload_router,
 )
-from app.api.dashboard import (
-    router as dashboard_router,
-)
 
 import app.models.resolution_case
 
@@ -21,12 +18,16 @@ from app.api.resolution import (
     router as resolution_router,
 )
 
+from app.api.dashboard import router as dashboard_router
+
 from app.api.itc import router as itc_router
+
+from app.api.graph import router as graph_router
 
 import app.models.upload
 import app.models.invoice
 
-
+from app.api.itc import router as itc_router
 import app.models.user
 import app.models.workspace
 
@@ -69,3 +70,4 @@ app.include_router(upload_router)
 app.include_router(dashboard_router)
 app.include_router(resolution_router)
 app.include_router(itc_router)
+app.include_router(graph_router)

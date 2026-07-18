@@ -1,19 +1,27 @@
+from time import time
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import File
+from fastapi import Form
 from fastapi import HTTPException
 from fastapi import UploadFile
 
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.dependencies.current_user import get_current_user
 
-from app.services.storage_service import StorageService
+from app.core.storage import StorageService
+
 from app.services.upload_service import UploadService
 from app.services.parser_service import ParserService
 from app.services.normalizer_service import NormalizerService
 from app.services.invoice_service import InvoiceService
+from app.services.itc_service import ITCService
+
+from app.services.resolution_service import ResolutionService
+from app.services.dashboard_service import DashboardService
+from app.services.graph_service import GraphService
 
 router = APIRouter(
     prefix="/upload",
@@ -21,25 +29,28 @@ router = APIRouter(
 )
 
 
-@router.post("")
+@router.post("/")
 async def upload_file(
-    workspace_id: str,
+    workspace_id: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
 ):
+
+    upload = None
+
+    pipeline_start = time()
 
     try:
 
-        # ------------------------------------------------
-        # STEP 1 - Store file
-        # ------------------------------------------------
+        # ----------------------------------------
+        # Save file
+        # ----------------------------------------
 
         stored = await StorageService.save(file)
 
-        # ------------------------------------------------
-        # STEP 2 - Create Upload Record
-        # ------------------------------------------------
+        # ----------------------------------------
+        # Create upload entry
+        # ----------------------------------------
 
         upload = UploadService.create(
             db=db,
@@ -48,84 +59,145 @@ async def upload_file(
         )
 
         UploadService.mark_processing(
-            db,
-            upload,
+            db=db,
+            upload=upload,
         )
 
-        # ------------------------------------------------
-        # STEP 3 - Parse File
-        # ------------------------------------------------
+        # ----------------------------------------
+        # Parse file
+        # ----------------------------------------
 
         rows = ParserService.parse(
             stored["path"],
             stored["extension"],
         )
 
-        # ------------------------------------------------
-        # STEP 4 - Normalize
-        # ------------------------------------------------
+        if not rows:
+
+            raise Exception(
+                "No records found in uploaded file."
+            )
+
+        # ----------------------------------------
+        # Normalize rows
+        # ----------------------------------------
 
         rows = NormalizerService.normalize(rows)
 
-        # ------------------------------------------------
-        # STEP 5 - Save Invoices
-        # ------------------------------------------------
+        # ----------------------------------------
+        # Import invoices
+        # ----------------------------------------
 
-        invoice_count = InvoiceService.import_invoices(
+        result = InvoiceService.import_invoices(
             db=db,
             upload_id=upload.id,
             rows=rows,
         )
+        # ----------------------------------------
+        # Run ITC Analysis
+        # ----------------------------------------
 
-        # ------------------------------------------------
-        # STEP 6 - Update Upload Status
-        # ------------------------------------------------
+        itc_summary = ITCService.run(
+            db=db,
+            workspace_id=workspace_id,
+        )
+
+        resolution_summary = ResolutionService.run(db)
+
+        graph_summary = GraphService.sync_workspace(
+            db=db,
+            workspace_id=workspace_id,
+        )
+
+        # ----------------------------------------
+        # Refresh Dashboard Metrics
+        # ----------------------------------------
+
+        dashboard_summary = DashboardService.get_summary(
+            db=db,
+            workspace_id=workspace_id,
+        )
+
+        processing_time_ms = int(
+                    (time() - pipeline_start) * 1000
+            )
+
+        # ----------------------------------------
+        # Update upload summary
+        # ----------------------------------------
 
         UploadService.mark_completed(
             db=db,
             upload=upload,
             parser=stored["extension"],
-            invoice_count=invoice_count,
+            invoice_count=(
+                result["imported"]
+                + result["duplicates"]
+                + result["failed"]
+            ),
+            imported_count=result["imported"],
+            duplicate_count=result["duplicates"],
+            failed_count=result["failed"],
+            validation_errors=0,
+            processing_time_ms=processing_time_ms,
         )
 
-        # ------------------------------------------------
-        # STEP 7 - Response
-        # ------------------------------------------------
+        # ----------------------------------------
+        # Response
+        # ----------------------------------------
+
+           # ----------------------------------------
+        # Response
+        # ----------------------------------------
 
         return {
 
             "success": True,
 
-            "workspace_id": workspace_id,
+            "message": "Upload completed successfully.",
 
-            "upload_id": upload.id,
+            "upload_id": str(upload.id),
 
-            "original_name": stored["original_name"],
+            "filename": stored["original_name"],
 
-            "stored_name": stored["stored_name"],
+            "parser": stored["extension"],
 
-            "file_type": stored["extension"],
+            "invoice_count": (
+                result["imported"]
+                + result["duplicates"]
+                + result["failed"]
+            ),
 
-            "invoice_count": invoice_count,
+            "imported": result["imported"],
 
-            "status": "completed",
+            "duplicates": result["duplicates"],
+
+            "failed": result["failed"],
+
+            "validation_errors": 0,
+
+            "processing_time_ms": processing_time_ms,
+
+            "itc": itc_summary,
+
+            "resolution": resolution_summary,
+
+            "graph": graph_summary,
+
+            "dashboard": dashboard_summary,
 
         }
-
     except Exception as e:
 
-        try:
+        if upload is not None:
 
             UploadService.mark_failed(
-                db,
-                upload,
-                str(e),
+                db=db,
+                upload=upload,
+                error=str(e),
             )
 
-        except Exception:
-            pass
-
         raise HTTPException(
-            status_code=500,
+            status_code=400,
             detail=str(e),
         )

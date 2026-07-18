@@ -1,30 +1,59 @@
 from datetime import datetime
-from uuid import UUID
+from typing import Optional
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
-class ResolutionResponse(BaseModel):
+class ResolutionCaseBase(BaseModel):
 
-    id: UUID
+    workspace_id: str
 
-    workspace_id: UUID
-
-    invoice_id: UUID
+    invoice_id: str
 
     issue_type: str
 
     severity: str
 
-    status: str
-
     description: str
 
     recoverable_amount: float
 
+
+class ResolutionCaseCreate(ResolutionCaseBase):
+    pass
+
+
+class ResolutionCaseUpdate(BaseModel):
+
+    status: Optional[str] = None
+
+    severity: Optional[str] = None
+
+    description: Optional[str] = None
+
+    recoverable_amount: Optional[float] = None
+
+
+class ResolutionCaseResponse(ResolutionCaseBase):
+
+    id: str
+
+    status: str
+
     created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    class Config:
+        from_attributes = True
+
+
+class ResolutionFinding(BaseModel):
+
+    invoice_id: str
+
+    issue_type: str
+
+    severity: str
+
+    description: str
+
+    recoverable_amount: float

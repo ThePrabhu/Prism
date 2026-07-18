@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.invoice import Invoice
 from app.models.upload import Upload
+from app.models.resolution_case import ResolutionCase
 
 
 class DashboardService:
@@ -70,7 +71,89 @@ class DashboardService:
             total_gst - blocked_itc
         )
 
-        risk_score = 15
+        open_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.status == "open",
+            )
+            .count()
+        )
+
+        resolved_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.status == "resolved",
+            )
+            .count()
+        )
+
+        critical_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.severity == "CRITICAL",
+            )
+            .count()
+        )
+
+        high_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.severity == "HIGH",
+            )
+            .count()
+        )
+
+        medium_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.severity == "MEDIUM",
+            )
+            .count()
+        )
+
+        low_cases = (
+            db.query(ResolutionCase)
+            .filter(
+                ResolutionCase.workspace_id == workspace_id,
+                ResolutionCase.severity == "LOW",
+            )
+            .count()
+        )
+
+        recoverable_gst = (
+            db.query(
+                func.coalesce(
+                    func.sum(
+                        ResolutionCase.recoverable_amount
+                    ),
+                    0,
+                )
+            )
+            .filter(
+                ResolutionCase.workspace_id == workspace_id
+            )
+            .scalar()
+        )
+
+        total_cases = open_cases + resolved_cases
+
+        compliance_score = (
+            100
+            if total_cases == 0
+            else round(
+                resolved_cases * 100 / total_cases,
+                2,
+            )
+        )
+
+        risk_score = (
+            100 - compliance_score
+        )
 
         return {
 
@@ -89,5 +172,21 @@ class DashboardService:
             "total_gst": total_gst,
 
             "risk_score": risk_score,
+
+            "open_cases": open_cases,
+
+            "resolved_cases": resolved_cases,
+
+            "critical_cases": critical_cases,
+
+            "high_cases": high_cases,
+
+            "medium_cases": medium_cases,
+
+            "low_cases": low_cases,
+
+            "recoverable_gst": recoverable_gst,
+
+            "compliance_score": compliance_score,
 
         }

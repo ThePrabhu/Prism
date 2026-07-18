@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
@@ -12,6 +14,7 @@ class User(Base):
     id = Column(
         String,
         primary_key=True,
+        default=lambda: str(uuid4()),
         index=True,
     )
 
@@ -30,5 +33,5 @@ class User(Base):
     workspaces = relationship(
         "Workspace",
         back_populates="owner",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )

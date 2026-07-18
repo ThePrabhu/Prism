@@ -1,15 +1,9 @@
-import os
-import shutil
-import uuid
+from uuid import uuid4
+from pathlib import Path
 
 from fastapi import UploadFile
 
-UPLOAD_FOLDER = "uploads"
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True,
-)
+from app.core.storage import supabase, BUCKET_NAME
 
 
 class StorageService:
@@ -17,32 +11,31 @@ class StorageService:
     @staticmethod
     async def save(file: UploadFile):
 
-        extension = file.filename.split(".")[-1].lower()
+        extension = Path(file.filename).suffix
 
-        filename = (
-            f"{uuid.uuid4()}.{extension}"
+        filename = f"{uuid4()}{extension}"
+
+        file_bytes = await file.read()
+
+        path = f"uploads/{filename}"
+
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path=path,
+            file=file_bytes,
+            file_options={
+                "content-type": file.content_type
+            },
         )
 
-        path = os.path.join(
-            UPLOAD_FOLDER,
-            filename,
-        )
-
-        with open(path, "wb") as buffer:
-
-            shutil.copyfileobj(
-                file.file,
-                buffer,
-            )
+        @staticmethod
+        def delete(path: str):
+                supabase.storage.from_(BUCKET_NAME).remove([path])
 
         return {
-
-            "path": path,
-
+            "original_name": file.filename,
             "stored_name": filename,
-
+            "path": path,
             "extension": extension,
-
-            "size": os.path.getsize(path),
-
+            "size": len(file_bytes),
         }
+    

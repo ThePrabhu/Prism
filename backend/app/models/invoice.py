@@ -6,6 +6,7 @@ from sqlalchemy import DateTime
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
+from sqlalchemy import Index
 
 from sqlalchemy.orm import relationship
 
@@ -20,29 +21,58 @@ class Invoice(Base):
         String,
         primary_key=True,
         default=lambda: str(uuid4()),
+        index=True,
     )
 
     upload_id = Column(
         String,
         ForeignKey("uploads.id"),
         nullable=False,
+        index=True,
     )
 
-    invoice_number = Column(String)
+    invoice_number = Column(
+        String,
+        nullable=False,
+        index=True,
+    )
 
-    invoice_date = Column(String)
+    invoice_date = Column(
+        String,
+        nullable=True,
+    )
 
-    buyer_name = Column(String)
+    supplier_gstin = Column(
+        String,
+        nullable=True,
+        index=True,
+    )
 
-    seller_name = Column(String)
+    recipient_gstin = Column(
+        String,
+        nullable=True,
+        index=True,
+    )
 
-    gstin = Column(String)
+    taxable_value = Column(
+        Float,
+        default=0,
+    )
 
-    taxable_value = Column(Float)
+    gst_amount = Column(
+        Float,
+        default=0,
+    )
 
-    gst_amount = Column(Float)
+    total_amount = Column(
+        Float,
+        default=0,
+    )
 
-    total_amount = Column(Float)
+    status = Column(
+        String,
+        default="pending",
+    )
 
     created_at = Column(
         DateTime,
@@ -52,4 +82,13 @@ class Invoice(Base):
     upload = relationship(
         "Upload",
         back_populates="invoices",
+    )
+
+    __table_args__ = (
+        Index(
+            "idx_invoice_duplicate",
+            "supplier_gstin",
+            "invoice_number",
+            "invoice_date",
+        ),
     )

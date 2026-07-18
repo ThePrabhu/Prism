@@ -1,93 +1,166 @@
 from sqlalchemy import func
-from sqlalchemy.orm import Session
 
 from app.models.invoice import Invoice
 from app.models.upload import Upload
+from app.models.resolution_case import ResolutionCase
 
 
 class DashboardService:
 
     @staticmethod
-    def get_summary(
-        db: Session,
-        workspace_id: str,
-    ):
+    def get_summary(db):
 
-        total_uploads = (
-            db.query(Upload)
-            .filter(
-                Upload.workspace_id == workspace_id
+        total_uploads = db.query(
+            Upload
+        ).count()
+
+        total_invoices = db.query(
+            Invoice
+        ).count()
+
+        open_cases = (
+
+            db.query(
+                ResolutionCase
             )
+
+            .filter(
+                ResolutionCase.status == "open"
+            )
+
             .count()
+
         )
 
-        invoices = (
-            db.query(Invoice)
-            .join(
-                Upload,
-                Upload.id == Invoice.upload_id,
+        resolved_cases = (
+
+            db.query(
+                ResolutionCase
             )
+
             .filter(
-                Upload.workspace_id == workspace_id
+                ResolutionCase.status == "resolved"
             )
+
+            .count()
+
         )
 
-        total_invoices = invoices.count()
+        critical_cases = (
 
-        total_taxable = (
-            invoices.with_entities(
+            db.query(
+                ResolutionCase
+            )
+
+            .filter(
+                ResolutionCase.severity == "CRITICAL"
+            )
+
+            .count()
+
+        )
+
+        high_cases = (
+
+            db.query(
+                ResolutionCase
+            )
+
+            .filter(
+                ResolutionCase.severity == "HIGH"
+            )
+
+            .count()
+
+        )
+
+        medium_cases = (
+
+            db.query(
+                ResolutionCase
+            )
+
+            .filter(
+                ResolutionCase.severity == "MEDIUM"
+            )
+
+            .count()
+
+        )
+
+        low_cases = (
+
+            db.query(
+                ResolutionCase
+            )
+
+            .filter(
+                ResolutionCase.severity == "LOW"
+            )
+
+            .count()
+
+        )
+
+        recoverable_gst = (
+
+            db.query(
+
                 func.coalesce(
                     func.sum(
-                        Invoice.taxable_value
+                        ResolutionCase.recoverable_amount
                     ),
                     0,
                 )
-            ).scalar()
-        )
 
-        total_gst = (
-            invoices.with_entities(
-                func.coalesce(
-                    func.sum(
-                        Invoice.gst_amount
-                    ),
-                    0,
-                )
-            ).scalar()
-        )
-
-        total_vendors = (
-            invoices.with_entities(
-                Invoice.seller_name
             )
-            .distinct()
-            .count()
+
+            .scalar()
+
         )
 
-        blocked_itc = total_gst * 0.20
-
-        recoverable_itc = (
-            total_gst - blocked_itc
+        total_cases = (
+            open_cases + resolved_cases
         )
 
-        risk_score = 15
+        if total_cases == 0:
+
+            compliance_score = 100.0
+
+        else:
+
+            compliance_score = round(
+
+                (
+                    resolved_cases
+                    / total_cases
+                )
+                * 100,
+
+                2,
+
+            )
 
         return {
 
-            "total_invoices": total_invoices,
-
             "total_uploads": total_uploads,
 
-            "total_vendors": total_vendors,
+            "total_invoices": total_invoices,
 
-            "blocked_itc": blocked_itc,
+            "open_cases": open_cases,
 
-            "recoverable_itc": recoverable_itc,
+            "resolved_cases": resolved_cases,
 
-            "total_taxable": total_taxable,
+            "critical_cases": critical_cases,
 
-            "total_gst": total_gst,
+            "high_cases": high_cases,
 
-            "risk_score": risk_score,
+            "medium_cases": medium_cases,
+
+            "low_cases": low_cases,
+
+            "recoverable_gst": recoverable_gst,
+
+            "compliance_score": compliance_score,
 
         }

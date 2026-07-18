@@ -1,11 +1,11 @@
+from datetime import datetime
+from uuid import uuid4
+
 from sqlalchemy import Column
+from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
-from sqlalchemy import DateTime
-
 from sqlalchemy.orm import relationship
-
-from datetime import datetime
 
 from app.core.database import Base
 
@@ -17,6 +17,7 @@ class Workspace(Base):
     id = Column(
         String,
         primary_key=True,
+        default=lambda: str(uuid4()),
         index=True,
     )
 
@@ -29,6 +30,7 @@ class Workspace(Base):
         String,
         ForeignKey("users.id"),
         nullable=False,
+        index=True,
     )
 
     created_at = Column(
@@ -39,4 +41,10 @@ class Workspace(Base):
     owner = relationship(
         "User",
         back_populates="workspaces",
+    )
+
+    uploads = relationship(
+        "Upload",
+        back_populates="workspace",
+        cascade="all, delete-orphan",
     )

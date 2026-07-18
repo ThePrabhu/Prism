@@ -14,7 +14,6 @@ class WorkspaceService:
     ):
 
         workspace = Workspace(
-            id=data.id if hasattr(data, "id") else None,
             name=data.name,
             owner_id=owner_id,
         )
@@ -33,9 +32,29 @@ class WorkspaceService:
 
         return (
             db.query(Workspace)
-            .filter(Workspace.owner_id == owner_id)
-            .order_by(Workspace.created_at.desc())
+            .filter(
+                Workspace.owner_id == owner_id,
+            )
+            .order_by(
+                Workspace.created_at.desc(),
+            )
             .all()
+        )
+
+    @staticmethod
+    def get_workspace(
+        db: Session,
+        workspace_id: str,
+        owner_id: str,
+    ):
+
+        return (
+            db.query(Workspace)
+            .filter(
+                Workspace.id == workspace_id,
+                Workspace.owner_id == owner_id,
+            )
+            .first()
         )
 
     @staticmethod
@@ -45,13 +64,10 @@ class WorkspaceService:
         owner_id: str,
     ):
 
-        workspace = (
-            db.query(Workspace)
-            .filter(
-                Workspace.id == workspace_id,
-                Workspace.owner_id == owner_id,
-            )
-            .first()
+        workspace = WorkspaceService.get_workspace(
+            db,
+            workspace_id,
+            owner_id,
         )
 
         if workspace is None:
@@ -59,5 +75,29 @@ class WorkspaceService:
 
         db.delete(workspace)
         db.commit()
+
+        return workspace
+
+    @staticmethod
+    def rename_workspace(
+        db: Session,
+        workspace_id: str,
+        owner_id: str,
+        name: str,
+    ):
+
+        workspace = WorkspaceService.get_workspace(
+            db,
+            workspace_id,
+            owner_id,
+        )
+
+        if workspace is None:
+            return None
+
+        workspace.name = name
+
+        db.commit()
+        db.refresh(workspace)
 
         return workspace
