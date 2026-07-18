@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 import { CheckCircle2 } from "lucide-react";
 
@@ -19,44 +19,44 @@ export default function ProcessingTimeline() {
         state => state.processingStage
     );
 
-    const setProcessingStage = useDashboardStore(
-        state => state.setProcessingStage
-    );
+    // const setProcessingStage = useDashboardStore(
+    //     state => state.setProcessingStage
+    // );
 
-    const setWorkspaceMode = useDashboardStore(
-        state => state.setWorkspaceMode
-    );
+    // const setWorkspaceMode = useDashboardStore(
+    //     state => state.setWorkspaceMode
+    // );
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        async function simulate(){
+    //     async function simulate(){
 
-            const stages = [
-                "uploading",
-                "ocr",
-                "graph",
-                "matching",
-                "analysis",
-                "completed",
-            ] as const;
+    //         const stages = [
+    //             "uploading",
+    //             "ocr",
+    //             "graph",
+    //             "matching",
+    //             "analysis",
+    //             "completed",
+    //         ] as const;
 
-            for(const stage of stages){
+    //         for(const stage of stages){
 
-                setProcessingStage(stage);
+    //             setProcessingStage(stage);
 
-                await new Promise(resolve =>
-                    setTimeout(resolve,900)
-                );
+    //             await new Promise(resolve =>
+    //                 setTimeout(resolve,900)
+    //             );
 
-            }
+    //         }
 
-            setWorkspaceMode("completed");
+    //         setWorkspaceMode("completed");
 
-        }
+    //     }
 
-        simulate();
+    //     simulate();
 
-    },[]);
+    // },[]);
 
     const activeIndex = STEPS.findIndex(step => {
 

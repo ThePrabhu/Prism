@@ -17,7 +17,7 @@ class UploadService {
         });
 
         return apiClient.post(
-            "/upload",
+            "/upload/",
             form
         );
     }

@@ -66,6 +66,38 @@ const initialProcessingSteps: ProcessingStep[] = [
     },
 ];
 
+export interface DashboardSummary {
+    total_invoices: number;
+    mismatches: number;
+    claimable_itc: number;
+}
+
+export interface GraphNode {
+    id: string;
+    position: { x: number; y: number };
+    data: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
+export interface GraphEdge {
+    id: string;
+    source: string;
+    target: string;
+    [key: string]: unknown;
+}
+
+export interface GraphData {
+    nodes: GraphNode[];
+    edges: GraphEdge[];
+}
+
+export interface UploadResult {
+    dashboard: DashboardSummary;
+    graph: GraphData;
+    itc: unknown;
+    resolution: unknown;
+}
+
 export interface DashboardStore {
 
     /* =========================
@@ -144,6 +176,12 @@ export interface DashboardStore {
 
     setUploadProgress: (
         progress: number
+    ) => void;
+
+    uploadResult: UploadResult | null;
+
+    setUploadResult: (
+        result: UploadResult
     ) => void;
 
     /* =========================
@@ -383,6 +421,13 @@ export const useDashboardStore = create<DashboardStore>()(
                         progress,
                 }),
 
+            uploadResult: null,
+
+            setUploadResult: (result) =>
+                set({
+                    uploadResult: result,
+                }),
+
             /* Processing */
 
             processingStage: "idle",
@@ -445,6 +490,9 @@ export const useDashboardStore = create<DashboardStore>()(
 
                 activeWorkspaceId:
                     state.activeWorkspaceId,
+
+                uploadResult:
+                    state.uploadResult,
             }),
         }
     )

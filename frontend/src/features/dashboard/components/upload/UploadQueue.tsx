@@ -1,5 +1,6 @@
 import UploadCard from "./UploadCard";
 import UploadActions from "./UploadActions";
+import { uploadService } from "../../services/upload.service";
 
 import { useDashboardStore } from "../../store/dashboardStore";
 
@@ -56,47 +57,52 @@ export default function UploadQueue() {
     }
 
     async function processFiles() {
-        if (!files.length) return;
+    if (!files.length) return;
 
-        if (!activeWorkspace) return;
+    if (!activeWorkspace) return;
 
-        // Save files inside workspace
+    try {
+        // Save files into workspace
         addFilesToWorkspace(
             activeWorkspace.id,
             files
         );
 
         setWorkspaceMode("processing");
-
         setProcessingStage("uploading");
+        setUploadProgress(10);
 
-        setUploadProgress(15);
+        // Upload to backend
+        const response = await uploadService.uploadFiles(
+            activeWorkspace.id,
+            files
+                .map((f) => f.file)
+                .filter(Boolean) as File[]
+        );
 
-        // Fake processing animation
+        console.log("Upload Response:", response);
 
-        setTimeout(() => {
-            setProcessingStage("ocr");
-            setUploadProgress(35);
-        }, 700);
+        setProcessingStage("ocr");
+        setUploadProgress(35);
 
-        setTimeout(() => {
-            setProcessingStage("graph");
-            setUploadProgress(60);
-        }, 1500);
+        setProcessingStage("graph");
+        setUploadProgress(60);
 
-        setTimeout(() => {
-            setProcessingStage("analysis");
-            setUploadProgress(85);
-        }, 2300);
+        setProcessingStage("analysis");
+        setUploadProgress(90);
 
-        setTimeout(() => {
-            setProcessingStage("completed");
+        setProcessingStage("completed");
+        setUploadProgress(100);
 
-            setUploadProgress(100);
+        setWorkspaceMode("completed");
+    } catch (error) {
+        console.error(error);
 
-            setWorkspaceMode("completed");
-        }, 3200);
+        alert("Upload failed.");
+
+        setWorkspaceMode("upload");
     }
+}
 
     if (!files.length) return null;
 

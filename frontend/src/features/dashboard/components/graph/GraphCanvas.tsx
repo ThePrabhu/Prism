@@ -7,9 +7,34 @@ import {
     ReactFlow,
 } from "@xyflow/react";
 
-import { graphData } from "./graphData";
+import { useDashboardStore } from "../../store/dashboardStore";
 
 export default function GraphCanvas() {
+    const uploadResult = useDashboardStore(
+        (state) => state.uploadResult
+    );
+
+    const graph = uploadResult?.graph;
+
+    if (!graph) {
+        return (
+            <div
+                className="
+                    flex
+                    h-[650px]
+                    items-center
+                    justify-center
+                    rounded-3xl
+                    border
+                    border-zinc-200
+                    text-zinc-500
+                "
+            >
+                No graph generated yet.
+            </div>
+        );
+    }
+
     return (
         <div
             className="
@@ -22,13 +47,11 @@ export default function GraphCanvas() {
         >
             <ReactFlow
                 fitView
-                nodes={graphData.nodes}
-                edges={graphData.edges}
+                nodes={graph.nodes ?? []}
+                edges={graph.edges ?? []}
             >
                 <MiniMap />
-
                 <Controls />
-
                 <Background gap={18} />
             </ReactFlow>
         </div>
