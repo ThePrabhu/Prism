@@ -1,195 +1,197 @@
-// import { useEffect } from "react";
+// src/features/dashboard/components/upload/UploadDropzone.tsx
 
-import { CheckCircle2 } from "lucide-react";
+import { useRef, type DragEvent } from "react";
+import {
+  FileText,
+  Table2,
+  Truck,
+  UploadCloud,
+} from "lucide-react";
 
 import { useDashboardStore } from "../../store/dashboardStore";
 
-const STEPS = [
-    "Uploading",
-    "OCR",
-    "Building Graph",
-    "Matching",
-    "AI Analysis",
-    "Completed",
+const ACCEPTED_TYPES = [
+  ".csv",
+  ".xlsx",
+  ".xls",
+  ".pdf",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".json",
 ];
 
-export default function ProcessingTimeline() {
+const fileTiles = [
+  {
+    label: "GSTR-1",
+    icon: FileText,
+  },
+  {
+    label: "GSTR-2B",
+    icon: FileText,
+  },
+  {
+    label: "GSTR-3B",
+    icon: FileText,
+  },
+  {
+    label: "Invoices",
+    icon: Table2,
+  },
+  {
+    label: "E-waybill",
+    icon: Truck,
+  },
+];
 
-    const processingStage = useDashboardStore(
-        state => state.processingStage
-    );
+export default function UploadDropzone() {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    // const setProcessingStage = useDashboardStore(
-    //     state => state.setProcessingStage
-    // );
+  const selectedFiles = useDashboardStore(
+    (state) => state.selectedFiles
+  );
 
-    // const setWorkspaceMode = useDashboardStore(
-    //     state => state.setWorkspaceMode
-    // );
+  const setSelectedFiles = useDashboardStore(
+    (state) => state.setSelectedFiles
+  );
 
-    // useEffect(() => {
+  const setWorkspaceMode = useDashboardStore(
+    (state) => state.setWorkspaceMode
+  );
 
-    //     async function simulate(){
+  function handleFiles(fileList: FileList | null) {
+    if (!fileList) return;
 
-    //         const stages = [
-    //             "uploading",
-    //             "ocr",
-    //             "graph",
-    //             "matching",
-    //             "analysis",
-    //             "completed",
-    //         ] as const;
+    const files = Array.from(fileList).map((file) => ({
+      id: crypto.randomUUID(),
+      workspaceId: "",
+      name: file.name,
+      size: file.size,
+      mimeType: file.type,
+      extension: file.name.split(".").pop() ?? "",
+      progress: 0,
+      status: "queued" as const,
+    }));
 
-    //         for(const stage of stages){
+    setSelectedFiles([
+      ...selectedFiles,
+      ...files,
+    ]);
 
-    //             setProcessingStage(stage);
+    setWorkspaceMode("upload");
+  }
 
-    //             await new Promise(resolve =>
-    //                 setTimeout(resolve,900)
-    //             );
+  function handleDrop(
+    event: DragEvent<HTMLDivElement>
+  ) {
+    event.preventDefault();
+    handleFiles(event.dataTransfer.files);
+  }
 
-    //         }
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        hidden
+        accept={ACCEPTED_TYPES.join(",")}
+        onChange={(e) => handleFiles(e.target.files)}
+      />
 
-    //         setWorkspaceMode("completed");
-
-    //     }
-
-    //     simulate();
-
-    // },[]);
-
-    const activeIndex = STEPS.findIndex(step => {
-
-        if(step==="Uploading")
-            return processingStage==="uploading";
-
-        if(step==="OCR")
-            return processingStage==="ocr";
-
-        if(step==="Building Graph")
-            return processingStage==="graph";
-
-        if(step==="Matching")
-            return processingStage==="matching";
-
-        if(step==="AI Analysis")
-            return processingStage==="analysis";
-
-        if(step==="Completed")
-            return processingStage==="completed";
-
-        return false;
-
-    });
-
-    return (
-
-        <section
-            className="
-                rounded-3xl
-                bg-white
-                p-8
-                shadow-[0_20px_60px_rgba(0,0,0,.08)]
-            "
+      <section
+        className="
+          rounded-[22px]
+          bg-white
+          p-3
+          shadow-[0_16px_44px_rgba(15,23,42,.07)]
+        "
+      >
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          className="
+            group
+            flex
+            cursor-pointer
+            flex-col
+            items-center
+            justify-center
+            rounded-2xl
+            border-2
+            border-dashed
+            border-emerald-200
+            bg-white
+            px-6
+            py-6
+            text-center
+            transition-all
+            duration-300
+            hover:border-emerald-400
+            hover:bg-emerald-50/20
+          "
         >
+          <UploadCloud
+            size={42}
+            className="
+              text-emerald-600
+              transition-transform
+              duration-300
+              group-hover:-translate-y-0.5
+            "
+          />
 
-            <h2
+          <p className="mt-3 text-sm font-bold text-zinc-950">
+            Drag &amp; drop files here
+          </p>
+
+          <p className="mt-1 text-sm font-semibold text-emerald-600">
+            or click to browse
+          </p>
+
+          <p className="mt-3 text-xs font-medium text-zinc-500">
+            Supports CSV, XLSX, PDF - Max 50MB per file
+          </p>
+        </div>
+
+        <div className="mt-4 flex gap-3">
+          {fileTiles.map((tile) => {
+            const Icon = tile.icon;
+
+            return (
+              <div
+                key={tile.label}
                 className="
-                    text-xl
-                    font-semibold
+                  flex
+                  h-[58px]
+                  min-w-0
+                  flex-1
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-xl
+                  border
+                  border-emerald-200
+                  bg-white
+                  p-3
+                  text-[15px]
+                  font-semibold
+                  text-zinc-800
+                  shadow-[0_4px_12px_rgba(15,23,42,.08)]
                 "
-            >
-                Processing Workspace
-            </h2>
+              >
+                <Icon
+                  size={19}
+                  className="text-emerald-600"
+                />
 
-            <p
-                className="
-                    mt-1
-                    text-sm
-                    text-zinc-500
-                "
-            >
-                Prism is analyzing your GST documents...
-            </p>
-
-            <div className="mt-8 space-y-6">
-
-                {STEPS.map((step,index)=>{
-
-                    const completed=index<activeIndex;
-
-                    const active=index===activeIndex;
-
-                    return(
-
-                        <div
-                            key={step}
-                            className="
-                                flex
-                                items-center
-                                gap-4
-                            "
-                        >
-
-                            <div
-                                className={`
-                                    flex
-                                    h-9
-                                    w-9
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    ${
-                                        completed
-                                        ? "bg-emerald-500 text-white"
-                                        : active
-                                        ? "bg-emerald-100 text-emerald-700 animate-pulse"
-                                        : "bg-zinc-100 text-zinc-400"
-                                    }
-                                `}
-                            >
-
-                                {completed
-                                ? <CheckCircle2 size={18}/>
-                                : index+1}
-
-                            </div>
-
-                            <div>
-
-                                <p
-                                    className="
-                                        font-medium
-                                    "
-                                >
-                                    {step}
-                                </p>
-
-                                {active && (
-
-                                    <p
-                                        className="
-                                            text-sm
-                                            text-emerald-600
-                                        "
-                                    >
-                                        In Progress...
-                                    </p>
-
-                                )}
-
-                            </div>
-
-                        </div>
-
-                    );
-
-                })}
-
-            </div>
-
-        </section>
-
-    );
-
+                <span>{tile.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </>
+  );
 }
