@@ -5,15 +5,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import type { ITCRecord } from "../types/itc.types";
-
-interface ITCActionMenuProps {
-    record: ITCRecord;
-}
-
-export default function ITCActionMenu({
-    record,
-}: ITCActionMenuProps) {
+export default function ITCActionMenu() {
     const navigate = useNavigate();
 
     function openResolution() {
@@ -42,7 +34,6 @@ export default function ITCActionMenu({
             "
         >
             {/* Resolution */}
-
             <button
                 onClick={openResolution}
                 title="Open Resolution Center"
@@ -67,7 +58,6 @@ export default function ITCActionMenu({
             </button>
 
             {/* Prism AI */}
-
             <button
                 onClick={openAI}
                 title="Ask Prism AI"
@@ -92,7 +82,6 @@ export default function ITCActionMenu({
             </button>
 
             {/* GST Portal */}
-
             <button
                 onClick={openGSTPortal}
                 title="Open GST Portal"

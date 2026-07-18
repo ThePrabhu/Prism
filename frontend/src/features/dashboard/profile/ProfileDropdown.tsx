@@ -100,43 +100,44 @@ export default function ProfileDropdown({
                     />
                 </div>
 
-                <div className="flex-1 text-left">
+                {!collapsed && (
+    <>
+        <div className="flex-1 text-left">
+            <p
+                className="
+                    truncate
+                    text-sm
+                    font-semibold
+                "
+            >
+                {name}
+            </p>
 
-                    <p
-                        className="
-                            truncate
-                            text-sm
-                            font-semibold
-                        "
-                    >
-                        {name}
-                    </p>
+            <p
+                className="
+                    truncate
+                    text-xs
+                    text-zinc-500
+                "
+            >
+                {email}
+            </p>
+        </div>
 
-                    <p
-                        className="
-                            truncate
-                            text-xs
-                            text-zinc-500
-                        "
-                    >
-                        {email}
-                    </p>
-
-                </div>
-
-                <ChevronUp
-                    size={18}
-                    className={`
-                        transition-transform
-                        duration-200
-                        ${
-                            open
-                                ? "rotate-180"
-                                : ""
-                        }
-                    `}
-                />
-
+        <ChevronUp
+            size={18}
+            className={`
+                transition-transform
+                duration-200
+                ${
+                    open
+                        ? "rotate-180"
+                        : ""
+                }
+            `}
+        />
+    </>
+)}
             </button>
 
             {open && (

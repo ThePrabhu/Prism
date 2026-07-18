@@ -177,7 +177,7 @@ export default function ITCTableRow({
             <td className="px-6 py-5">
 
                 <ITCActionMenu
-                    record={record}
+    
                 />
 
             </td>
