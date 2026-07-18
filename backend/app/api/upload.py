@@ -32,7 +32,7 @@ router = APIRouter(
 @router.post("/")
 async def upload_file(
     workspace_id: str = Form(...),
-    file: UploadFile = File(...),
+    files: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
 ):
 
@@ -46,7 +46,7 @@ async def upload_file(
         # Save file
         # ----------------------------------------
 
-        stored = await StorageService.save(file)
+        stored = await StorageService.save(files)
 
         # ----------------------------------------
         # Create upload entry

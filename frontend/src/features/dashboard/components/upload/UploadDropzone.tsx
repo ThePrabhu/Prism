@@ -51,10 +51,15 @@ export default function UploadDropzone() {
     function handleFiles(fileList: FileList | null) {
         if (!fileList) return;
 
-        const files = Array.from(fileList).map((file) => ({
+        const files = Array.from(fileList).map(
+
+        (file) => ({
+
             id: crypto.randomUUID(),
 
             workspaceId: "",
+
+            file,
 
             name: file.name,
 
@@ -63,12 +68,17 @@ export default function UploadDropzone() {
             mimeType: file.type,
 
             extension:
-                file.name.split(".").pop() ?? "",
+                file.name
+                    .split(".")
+                    .pop() ?? "",
 
             progress: 0,
 
             status: "queued" as const,
-        }));
+
+        })
+
+        );
 
         const updatedFiles = [
             ...selectedFiles,

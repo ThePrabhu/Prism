@@ -1,40 +1,25 @@
-import type { WorkspaceFile } from "../types/dashboard.types";
+import { apiClient } from "../api/client";
 
 class UploadService {
-
     async uploadFiles(
         workspaceId: string,
         files: File[]
     ) {
-        console.log(
-            "Uploading",
-            workspaceId,
-            files
+        const form = new FormData();
+
+        form.append(
+            "workspace_id",
+            workspaceId
         );
 
-        return {
-            success: true,
-        };
-    }
+        files.forEach((file) => {
+            form.append("files", file);
+        });
 
-    async retryUpload(fileId: string) {
-        console.log(fileId);
-    }
-
-    async cancelUpload(fileId: string) {
-        console.log(fileId);
-    }
-
-    async removeFile(fileId: string) {
-        console.log(fileId);
-    }
-
-    async listWorkspaceFiles(
-        workspaceId: string
-    ) {
-        console.log(workspaceId);
-
-        return [] as WorkspaceFile[];
+        return apiClient.post(
+            "/upload",
+            form
+        );
     }
 }
 

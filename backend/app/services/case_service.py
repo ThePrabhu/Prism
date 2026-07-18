@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.invoice import Invoice
 from app.models.itc_record import ITCRecord
-from app.models.case import ComplianceCase
+from app.models.resolution_case import ResolutionCase
 
 
 class CaseService:
@@ -46,9 +46,9 @@ class CaseService:
             ):
 
                 exists = (
-                    db.query(ComplianceCase)
+                    db.query(ResolutionCase)
                     .filter(
-                        ComplianceCase.invoice_id == invoice.id
+                        ResolutionCase.invoice_id == invoice.id
                     )
                     .first()
                 )
@@ -56,7 +56,7 @@ class CaseService:
                 if exists:
                     continue
 
-                case = ComplianceCase(
+                case = ResolutionCase(
 
                     id=str(uuid.uuid4()),
 
@@ -66,9 +66,12 @@ class CaseService:
 
                     severity="HIGH",
 
-                    title="Potential GST Compliance Issue",
-
+                    issue_type=itc.reason,
                     description=itc.reason,
+                    
+                    recoverable_amount=float(itc.recoverable_amount or 0),
+                    
+                    status="open",
 
                 )
 

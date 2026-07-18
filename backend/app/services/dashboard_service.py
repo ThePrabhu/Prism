@@ -3,9 +3,11 @@ from sqlalchemy import func
 from app.models.invoice import Invoice
 from app.models.upload import Upload
 from app.models.resolution_case import ResolutionCase
+from app.models.resolution_case import ResolutionCase
 
 
 class DashboardService:
+
 
     @staticmethod
     def get_summary(db):

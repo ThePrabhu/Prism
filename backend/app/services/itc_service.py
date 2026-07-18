@@ -6,6 +6,7 @@ from app.models.itc_record import ITCRecord
 
 from app.services.itc_engine import ITCEngine
 
+from app.services.case_service import CaseService
 
 class ITCService:
 
@@ -107,6 +108,11 @@ class ITCService:
             recoverable_gst += finding.recoverable_amount
 
         db.commit()
+
+        CaseService.generate(
+            db=db,
+            workspace_id=workspace_id,
+        )
 
         return {
 

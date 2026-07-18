@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 from app.core.config import settings
 
@@ -24,12 +28,15 @@ from app.api.itc import router as itc_router
 
 from app.api.graph import router as graph_router
 
+from app.api.copilot import router as copilot_router
+
 import app.models.upload
 import app.models.invoice
 
 from app.api.itc import router as itc_router
 import app.models.user
 import app.models.workspace
+from app.api.cases import router as case_router
 
 
 app = FastAPI(
@@ -71,3 +78,5 @@ app.include_router(dashboard_router)
 app.include_router(resolution_router)
 app.include_router(itc_router)
 app.include_router(graph_router)
+app.include_router(case_router)
+app.include_router(copilot_router)

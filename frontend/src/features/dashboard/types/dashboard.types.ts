@@ -91,6 +91,8 @@ export interface WorkspaceFile {
 
     workspaceId: string;
 
+    file?: File;
+
     name: string;
 
     size: number;
@@ -105,7 +107,6 @@ export interface WorkspaceFile {
 
     uploadedAt?: string;
 }
-
 /* ==========================================================
    PROCESSING
 ========================================================== */

@@ -10,15 +10,24 @@ async function request<T>(
     endpoint: string,
     options: RequestOptions = {}
 ): Promise<T> {
-    const { token, headers, ...rest } = options;
+    const { token, headers, body, ...rest } = options;
+
+    const isFormData = body instanceof FormData;
 
     const response = await fetch(
         `${API_BASE_URL}${endpoint}`,
         {
             ...rest,
 
+            body,
+
             headers: {
-                "Content-Type": "application/json",
+                ...(isFormData
+                    ? {}
+                    : {
+                          "Content-Type":
+                              "application/json",
+                      }),
 
                 ...(token && {
                     Authorization: `Bearer ${token}`,
@@ -51,8 +60,11 @@ export const apiClient = {
         request<T>(url, {
             method: "POST",
             token,
-            body: JSON.stringify(body),
-        }),
+            body:
+            body instanceof FormData
+            ? body
+            : JSON.stringify(body),
+            }),
 
     put: <T>(
         url: string,
